@@ -1,0 +1,26 @@
+.layout {
+	height: 480px;
+	width: 1000px;
+	margin: 0 auto;
+	background-color: #fff;
+	overflow: hidden;
+	display: grid;
+	align-content: start;
+	grid-template-areas: 'video expressions';
+}
+
+.logo {
+	height: 50px;
+	margin: 0 auto;
+	display: block;
+}
+
+@media (max-width: 1050px) {
+	.layout {
+		width: 640px;
+		height: 1000px;
+		grid-template-areas: 
+		'video'
+		'expressions';
+	}
+}

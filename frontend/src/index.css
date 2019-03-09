@@ -1,0 +1,26 @@
+html, body {
+	min-width: 100%;
+	min-height: 100%;
+}
+
+body {
+	margin: 0;
+	padding: 0;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	background-image: url('https://auth.gfx.ms/16.000.28103.6/images/Backgrounds/0.jpg?x=a5dbd4393ff6a725c7e62b61df7e72f0');
+	background-size: cover;
+	background-repeat: no-repeat;
+	font-family: 'Segoe UI', 'Helvetica Neue', 'Lucida Grande', 'Roboto', 'Ebrima',
+		'Nirmala UI', 'Gadugi', 'Segoe Xbox Symbol', 'Segoe UI Symbol', 'Meiryo UI',
+		'Khmer UI', 'Tunga', 'Lao UI', 'Raavi', 'Iskoola Pota', 'Latha',
+		'Leelawadee', 'Microsoft YaHei UI', 'Microsoft JhengHei UI', 'Malgun Gothic',
+		'Estrangelo Edessa', 'Microsoft Himalaya', 'Microsoft New Tai Lue',
+		'Microsoft PhagsPa', 'Microsoft Tai Le', 'Microsoft Yi Baiti',
+		'Mongolian Baiti', 'MV Boli', 'Myanmar Text', 'Cambria Math';
+}
+
+code {
+	font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+		monospace;
+}
