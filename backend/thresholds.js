@@ -1,11 +1,11 @@
-export function get_delta_threshold() {
+export function getDeltaThreshold() {
 	return 0.3;
 }
 
-export function get_emotion_threshold() {
+export function getEmotionThreshold() {
 	return 0.8;
 }
 
-export function get_emotion_change_threshold() {
+export function getEmotionChangeThreshold() {
 	return 0.5;
 }

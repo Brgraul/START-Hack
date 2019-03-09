@@ -1,4 +1,4 @@
-function emotion_to_vector(emotion) {
+function emotionToVector(emotion) {
 	return [
 		emotion['anger'],
 		emotion['contempt'],
@@ -12,8 +12,8 @@ function emotion_to_vector(emotion) {
 }
 
 export default class Person {
-	constructor(azureFaceID, name) {
-		this.faceID = azureFaceID;
+	constructor(personID, name) {
+		this.personID = personID;
 		this.lastEmotion = {
 			anger: 0,
 			contempt: 0,
@@ -25,9 +25,15 @@ export default class Person {
 			surprise: 0
 		};
 		this.name = name;
+		this.emotionHistory = [];
 	}
 
-	get_emotion_vector() {
-		return emotion_to_vector(this.lastEmotion);
+	setEmotion(emotion) {
+		this.lastEmotion = emotion;
+		this.emotionHistory.push(emotion);
+	}
+
+	getEmotionVector() {
+		return emotionToVector(this.lastEmotion);
 	}
 }

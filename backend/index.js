@@ -40,7 +40,7 @@ app.post('/analyzeframe', async (req, res) => {
 	console.log(url);
 	const { error, result: expressions } = await azure.getExpressions(url);
 	if (error) res.send({ error });
-	const returnstring = await feedback.load_new_emotion(expressions, url);
+	const returnstring = await feedback.loadNewEmotion(expressions, url);
 	console.log(returnstring);
 	res.send({ expressions: returnstring });
 });

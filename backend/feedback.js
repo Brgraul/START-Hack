@@ -10,7 +10,7 @@ const anger = [Math.sqrt(0.5), Math.sqrt(0.5), 0, 0, 0, 0, 0, 0];
 const fear = [0, 0, Math.sqrt(0.5), Math.sqrt(0.5), 0, 0, 0, 0];
 const sad = [Math.sqrt(0.3333), Math.sqrt(0.3333), 0, 0, 0, 0, Math.sqrt(0.3333), 0];
 
-function emotion_to_vector(emotion) {
+function emotionToVector(emotion) {
 	return [
 		emotion['anger'],
 		emotion['contempt'],
@@ -24,20 +24,20 @@ function emotion_to_vector(emotion) {
 }
 
 /*
-function rename_person(faceID, newName) {
+function renamePerson(faceID, newName) {
 	people[faceID].name = newName;
 }
 
-function force_feedback() {
+function forceFeedback() {
 	feedback = [];
 	for (const [id, person] of Object.entries(people)) {
-		feedback.push(get_feedback(person, person.lastEmotion));
+		feedback.push(getFeedback(person, person.lastEmotion));
 	}
 	return feedback.join('\n');
 }
 */
 
-function dot_prod(v, w) {
+function dotProd(v, w) {
 	var tot = 0;
 	for (int i = 0; i < 8; i++) {
 		tot += v[i] * w[i];
@@ -53,7 +53,7 @@ function norm(vector) {
 	return Math.sqrt(tot);
 }
 
-function vectors_unequal(v1, v2) {
+function vectorsUnequal(v1, v2) {
 	for (var i = 0; i < 8; i++) {
 		if (v1[i] !== v2[i]) {
 			return true;
@@ -62,23 +62,23 @@ function vectors_unequal(v1, v2) {
 	return false;
 }
 
-function get_feedback(person, emotion) {
-	var emoVec = emotion_to_vector(emotion);
-	var oldEmo = person.get_emotion_vector();
+function getFeedback(person, emotion) {
+	var emoVec = emotionToVector(emotion);
+	var oldEmo = person.getEmotionVector();
 	var delta = [];
 	for (var i = 0; i < 8; i++) {
 		delta.push(emoVec[i] - oldEmo[i]);
 	}
-	if (norm(delta) < thresholds.get_emotion_change_threshold()) {
+	if (norm(delta) < thresholds.getEmotionChangeThreshold()) {
 		return undefined;
 	}
-	let topEmotions = get_top_emotions(emotion);
+	let topEmotions = getTopEmotions(emotion);
 	if (topEmotions.length === 0) {
 		return 'No emotions detected';
 	}
 	let primary = topEmotions[topEmotions.length - 1];
 	// Update last emotion
-	person.lastEmotion = emotion;
+	person.setEmotion(emotion);
 	// Provide feedback based on reaction
 	if (dot(emotion, anger) > 0.8) {
 		return `You made ${person.name} angry.`;
@@ -92,7 +92,7 @@ function get_feedback(person, emotion) {
 	return undefined;
 }
 
-export function load_new_emotion(face, imageData) {
+export function loadNewEmotion(face, imageData) {
 	console.log('Face1', face);
 	face = face[0];
 	let identified = undefined;
@@ -120,7 +120,7 @@ export function load_new_emotion(face, imageData) {
 		const rect = face.faceRectangle;
 		if (!rect) return 'Rect not found';
 		const facerect = [rect.left, rect.top, rect.width, rect.height].join(',');
-		const person_id = fetch(
+		const personID = fetch(
 			server + 'face/v1.0/persongroups/conversationpartners/persons',
 			{
 				method: 'POST',
@@ -135,7 +135,7 @@ export function load_new_emotion(face, imageData) {
 		fetch(
 			server +
 				'face/v1.0/persongroups/conversationpartners/persons/' +
-				person_id +
+				personID +
 				'/persistedfaces',
 			{
 				method: 'POST',
@@ -146,7 +146,7 @@ export function load_new_emotion(face, imageData) {
 		fetch(server + 'face/v1.0/persongroups/conversationpartners/train', {
 			method: 'POST'
 		});
-		face['faceId'] = person_id;
+		face['faceId'] = personID;
 	} else {
 		face['faceId'] = identified['candidates'][0]['personId'];
 		personName = fetch(
@@ -162,13 +162,13 @@ export function load_new_emotion(face, imageData) {
 		people[face['faceId']] = new Person(face['faceId'], personName);
 	}
 	console.log('Face2', face.faceAttributes);
-	return get_feedback(people[face.faceId], face.faceAttributes.emotion);
+	return getFeedback(people[face.faceId], face.faceAttributes.emotion);
 }
 
-function get_top_emotions(emotion) {
+function getTopEmotions(emotion) {
 	let emotions = [];
 	for (const [emo, value] of Object.entries(emotion)) {
-		if (value > thresholds.get_emotion_threshold()) {
+		if (value > thresholds.getEmotionThreshold()) {
 			emotions.push([emo, value]);
 		}
 	}
