@@ -199,5 +199,16 @@ def test():
 	}
 	}
 	print(FeedbackModule.load_new_emotion(facedata))
+	facedata["faceAttributes"]["emotion"] = {
+		"anger": 0.0,
+		"contempt": 0.0,
+		"disgust": 0.0,
+		"fear": 0.0,
+		"happiness": 1.0,
+		"neutral": 0.0,
+		"sadness": 0.0,
+		"surprise": 0.0
+		}
+	print(FeedbackModule.load_new_emotion(facedata))
 
 test()
