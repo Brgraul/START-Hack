@@ -121,7 +121,7 @@ export function load_new_emotion(face, imageData) {
 			return res.json();
 		});
 	} catch (e) {
-		return 'An error occured';
+		return e.toString();
 	}
 	var personName = 'Unnamed person';
 	if (
