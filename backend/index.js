@@ -4,6 +4,10 @@ import fs from 'fs';
 import cors from 'cors';
 import * as azure from './azure';
 import * as feedback from './feedback';
+import * as tts from './tts';
+const player = require('node-wav-player');
+
+
 
 const app = express();
 app.use(
@@ -37,10 +41,11 @@ app.post('/analyzeframe', async (req, res) => {
 		console.log(err)
 	);
 	const url = 'http://local.flomllr.com/frames/' + filename;
-	console.log(url);
+	//console.log(url);
 	const { error, result: expressions } = await azure.getExpressions(url);
 	if (error) res.send({ error, expressions });
 	const returnstring = await feedback.load_new_emotion(expressions, url);
-	console.log(returnstring);
+	//console.log(returnstring);
+	//setInterval(tts.callApi(returnstring), 15000);
 	res.send({ interpretation: returnstring, expressions });
 });
