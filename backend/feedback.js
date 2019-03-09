@@ -1,3 +1,6 @@
+const fetch = require('node-fetch')
+const server = 'https://westeurope.api.cognitive.microsoft.com/face/v1.0/';
+
 people = {};
 
 function rename_person(faceID, newName) {
@@ -79,8 +82,32 @@ function get_feedback(person, emotion) {
 }
 
 function load_new_emotion(face) {
+	identified = undefined;
+	try {
+		identified = fetch(server + "face/v1.0/identify", { method: 'POST', body: {
+			"personGroupId": "conversationpartners",
+			"faceIds": [face["faceId"]],
+			"maxNumOfCandidatesReturned": 1,
+			"confidenceThreshold": 0.5
+		}}).then(res => { return res.json(); });
+	} catch (e) {}
+	var personName = "Unnamed person";
+	if (identified === undefined or identified["candidates"].length == 0) {
+		const rect = face["faceRectangle"];
+		const facerect = [rect["left"],rect["top"],rect["width"],rect["height"]].join(",");
+		const person_id = fetch(server + "face/v1.0/persongroups/conversationpartners/persons", { method: 'POST', body: {
+			"name": personName,
+			"userData": ""
+		}}).then(res => { return res.json()["personId"] });
+		fetch(server + "face/v1.0/persongroups/conversationpartners/persons/" + person_id + "/persistedfaces", { method: 'POST', body: { imageData /* this needs to be added somehow */ }, params: "targetFace=" + facerect /* not sure about this either */ });
+		fetch(server + "face/v1.0/persongroups/conversationpartners/train", { method: 'POST' });
+		face["faceId"] = person_id;
+	} else {
+		face["faceId"] = identified["candidates"][0]["personId"];
+		personName = fetch(server + "face/v1.0/persongroups/conversationpartners/persons/" + face["faceId"], { method: 'GET' }).then(res => { return res.json()["name"]; });
+	}
 	if (!(face["faceId"] in people)) {
-		people[face["faceId"]] = new Person(face["faceId"], "Unnamed person");
+		people[face["faceId"]] = new Person(face["faceId"], personName);
 	}
 	return get_feedback(people[face["faceId"]], face["faceAttributes"]["emotion"]);
 }

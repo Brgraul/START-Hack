@@ -7,5 +7,5 @@ function get_emotion_threshold() {
 }
 
 function get_emotion_change_threshold() {
-	return 0;
+	return 0.5;
 }
