@@ -11,6 +11,12 @@ function emotionToVector(emotion) {
 	];
 }
 
+function vectorAddInplace(v, w) {
+	for (int i = 0; i < v.length; i++) {
+		v[i] += w[i];
+	}
+}
+
 export default class Person {
 	constructor(personID, name) {
 		this.personID = personID;
@@ -31,6 +37,23 @@ export default class Person {
 	setEmotion(emotion) {
 		this.lastEmotion = emotion;
 		this.emotionHistory.push(emotion);
+	}
+
+	getPieData() {
+		const count = this.emotionHistory.length;
+		freq = [0,0,0,0,0,0,0,0];
+		for (int i = 0; i < count; i++) {
+			vectorAddInplace(freq, this.emotionHistory[i]);
+		}
+		data = [{ name: "Anger", value: freq[0] / count }),
+			{ name: "Contempt", value: freq[1] / count }),
+			{ name: "Disgust", value: freq[2] / count }),
+			{ name: "Fear", value: freq[3] / count }),
+			{ name: "Happiness", value: freq[4] / count }),
+			{ name: "Neutral", value: freq[5] / count }),
+			{ name: "Sadness", value: freq[6] / count }),
+			{ name: "Surprise", value: freq[7] / count })];
+		return data;
 	}
 
 	getEmotionVector() {

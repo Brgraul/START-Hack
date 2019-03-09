@@ -42,5 +42,5 @@ app.post('/analyzeframe', async (req, res) => {
 	if (error) res.send({ error, expressions });
 	const returnstring = await feedback.loadNewEmotion(expressions, url);
 	console.log(returnstring);
-	res.send({ interpretation: returnstring, expressions });
+	res.send({ interpretation: returnstring, expressions, people: feedback.people });
 });
