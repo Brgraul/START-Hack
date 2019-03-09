@@ -1,5 +1,5 @@
 function emotion_to_vector(emotion) {
-	return [;
+	return [
 		emotion["anger"], emotion["contempt"], emotion["disgust"], emotion["fear"],
 		emotion["happiness"], emotion["neutral"], emotion["sadness"], emotion["surprise"]
 	];
@@ -13,6 +13,6 @@ class Person {
 	}
 
 	get_emotion_vector() {
-		return emotion_to_vector(lastEmotion);
+		return emotion_to_vector(this.lastEmotion);
 	}
 }
