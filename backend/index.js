@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import fs from 'fs';
 import cors from 'cors';
 import * as azure from './azure';
-
+import * as feedback from './feedback';
 
 const app = express();
 app.use(
@@ -18,7 +18,7 @@ app.listen(port, () => {
 	console.log('DiscountInCart Backend listening on port', port);
 });
 
-app.use('/frames', express.static('frames'))
+app.use('/frames', express.static('frames'));
 
 app.get('/', (req, res) => {
 	res.send(`Localhost`);
@@ -27,16 +27,20 @@ app.get('/', (req, res) => {
 app.post('/analyzeframe', async (req, res) => {
 	const { image } = req.body;
 	let base64Data;
-	if (image && image.split(',')[0].indexOf('base64') >= 0){
+	if (image && image.split(',')[0].indexOf('base64') >= 0) {
 		base64Data = image.split(',')[1];
 	} else {
-		res.json({error: 'Please provide valid base64 encoded image'});
+		res.json({ error: 'Please provide valid base64 encoded image' });
 	}
-	const filename = Date.now() + ".png";
-	fs.writeFile('./frames/'+filename, base64Data, 'base64', (err) => console.log(err));
-	const url = 'http://local.flomllr.com/frames/' + filename
+	const filename = new Date().getSeconds() + '.png';
+	fs.writeFile('./frames/' + filename, base64Data, 'base64', err =>
+		console.log(err)
+	);
+	const url = 'http://local.flomllr.com/frames/' + filename;
 	console.log(url);
 	const { error, result: expressions } = await azure.getExpressions(url);
-	res.send({ expressions });
+	if (error) res.send({ error });
+	const returnstring = await feedback.load_new_emotion(expressions, url);
+	console.log(returnstring);
+	res.send({ expressions: returnstring });
 });
-
