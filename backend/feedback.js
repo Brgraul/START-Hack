@@ -1,7 +1,8 @@
 import Person from './person';
 import * as thresholds from './thresholds';
 const fetch = require('node-fetch');
-const server = 'https://westeurope.api.cognitive.microsoft.com/face/v1.0/';
+const server = 'https://westeurope.api.cognitive.microsoft.com/';
+const subscriptionKey = '94e0060162d84581975ef1011b018af9';
 
 var people = {};
 
@@ -23,7 +24,6 @@ function emotionToVector(emotion) {
 	];
 }
 
-/*
 function renamePerson(faceID, newName) {
 	people[faceID].name = newName;
 }
@@ -35,7 +35,6 @@ function forceFeedback() {
 	}
 	return feedback.join('\n');
 }
-*/
 
 function dotProd(v, w) {
 	var tot = 0;
@@ -92,26 +91,31 @@ function getFeedback(person, emotion) {
 	return undefined;
 }
 
-export function loadNewEmotion(face, imageData) {
+export async function loadNewEmotion(face, imageData) {
 	console.log('Face1', face);
 	face = face[0];
 	let identified = undefined;
 	try {
-		identified = fetch(server + 'face/v1.0/identify', {
+		let identifiedRaw = await fetch(server + 'face/v1.0/identify', {
 			method: 'POST',
-			body: {
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				'Ocp-Apim-Subscription-Key': subscriptionKey
+			},
+			body: JSON.stringify({
 				personGroupId: 'conversationpartners',
 				faceIds: [face['faceId']],
 				maxNumOfCandidatesReturned: 1,
 				confidenceThreshold: 0.5
-			}
-		}).then(res => {
-			return res.json();
+			})
 		});
+		identified = await identifiedRaw.json();
 	} catch (e) {
-		return e.toString();
+		console.log(e);
 	}
 	var personName = 'Unnamed person';
+	console.log('Identified', identified);
 	if (
 		!identified ||
 		!identified['candidates'] ||
@@ -125,10 +129,15 @@ export function loadNewEmotion(face, imageData) {
 			server + 'face/v1.0/persongroups/conversationpartners/persons',
 			{
 				method: 'POST',
-				body: {
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+					'Ocp-Apim-Subscription-Key': subscriptionKey
+				},
+				body: JSON.stringify({
 					name: personName,
 					userData: ''
-				}
+				})
 			}
 		).then(res => {
 			return res.json()['personId'];
@@ -140,12 +149,22 @@ export function loadNewEmotion(face, imageData) {
 				'/persistedfaces',
 			{
 				method: 'POST',
-				body: { url: imageData },
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+					'Ocp-Apim-Subscription-Key': subscriptionKey
+				},
+				body: JSON.stringify({ url: imageData }),
 				params: 'targetFace=' + facerect /* not sure about this either */
 			}
 		);
 		fetch(server + 'face/v1.0/persongroups/conversationpartners/train', {
-			method: 'POST'
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				'Ocp-Apim-Subscription-Key': subscriptionKey
+			}
 		});
 		face['faceId'] = personID;
 	} else {
