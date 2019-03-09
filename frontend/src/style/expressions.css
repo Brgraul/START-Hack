@@ -2,3 +2,7 @@
 	padding: 30px;
 	grid-area: expressions;
 }
+
+.expressions img {
+	height: 50px;
+}
