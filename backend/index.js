@@ -47,7 +47,7 @@ app.post('/analyzeframe', async (req, res) => {
 			interpretation,
 			personId,
 			personName,
-			people: feedback.people
+			people
 		} = await feedback.loadNewEmotion(face, url);
 		console.log('Returnstring', interpretation);
 		res.send({ interpretation, expressions, personId, personName, people });

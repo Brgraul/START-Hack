@@ -6,29 +6,37 @@ class App extends Component {
 		expressions: undefined,
 		error: undefined,
 		people: undefined,
-		interpretation: undefined
+		interpretation: undefined,
+		personName: undefined,
+		personId: undefined
 	};
 
-	componentDidMount = () => {
+	componentDidMount = async () => {
 		try {
-			await fetch('https://westeurope.api.cognitive.microsoft.com/face/v1.0/persongroups/conversationpartners', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'Ocp-Apim-Subscription-Key': '94e0060162d84581975ef1011b018af9'
+			await fetch(
+				'https://westeurope.api.cognitive.microsoft.com/face/v1.0/persongroups/conversationpartners',
+				{
+					method: 'PUT',
+					headers: {
+						'Content-Type': 'application/json',
+						'Ocp-Apim-Subscription-Key': '94e0060162d84581975ef1011b018af9'
+					}
 				}
-			});
+			);
 		} catch (e) {}
 	};
 
 	handleImage = async image => {
-		const trainingStatus = await fetch('https://westeurope.api.cognitive.microsoft.com/face/v1.0/persongroups/conversationpartners/training', {
-			method: 'POST',
-			headers: {
-				'Ocp-Apim-Subscription-Key': '94e0060162d84581975ef1011b018af9'
+		const trainingStatus = await fetch(
+			'https://westeurope.api.cognitive.microsoft.com/face/v1.0/persongroups/conversationpartners/training',
+			{
+				method: 'GET',
+				headers: {
+					'Ocp-Apim-Subscription-Key': '94e0060162d84581975ef1011b018af9'
+				}
 			}
-		});
-		if (trainingStatus["status"] === "running") {
+		);
+		if (trainingStatus['status'] === 'running') {
 			return;
 		}
 		const rawResponse = await fetch('http://local.flomllr.com/analyzeframe', {
@@ -39,8 +47,15 @@ class App extends Component {
 			},
 			body: JSON.stringify({ image })
 		});
-		const { expressions, interpretation, error, people } = await rawResponse.json();
-		if (expressions || error || interpretation || people) {
+		const {
+			expressions,
+			interpretation,
+			error,
+			personId,
+			personName,
+			people
+		} = await rawResponse.json();
+		if (expressions || error || interpretation) {
 			let currState = this.state;
 			currState = {
 				expressions: expressions ? expressions : currState.expressions,
@@ -52,11 +67,38 @@ class App extends Component {
 			};
 			this.setState(currState);
 		}
+		console.log('Name', personName, personId);
+		this.setState({
+			personId,
+			personName
+		});
+	};
+
+	changeName = async (name, personId) => {
+		await fetch('http://local.flomllr.com/rename', {
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ name, personId })
+		});
+		this.setState({
+			personId: undefined,
+			personName: undefined
+		})
 	};
 
 	render() {
-		const { handleImage } = this;
-		const { expressions, error, interpretation, people } = this.state;
+		const { handleImage, changeName } = this;
+		const {
+			expressions,
+			error,
+			interpretation,
+			personId,
+			personName,
+			people
+		} = this.state;
 		return (
 			<div className='App'>
 				<div className='bg-overlay' />
@@ -70,6 +112,9 @@ class App extends Component {
 						expressions={expressions}
 						error={error}
 						interpretation={interpretation}
+						personId={personId}
+						personName={personName}
+						changeName={changeName}
 					/>
 					<Graph people={people} />
 				</Layout>

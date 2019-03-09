@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 const server = 'https://westeurope.api.cognitive.microsoft.com/';
 const subscriptionKey = '94e0060162d84581975ef1011b018af9';
 
-var people = {};
+export var people = {};
 
 const positive = [
 	-Math.sqrt(0.25),
@@ -44,18 +44,21 @@ function emotionToVector(emotion) {
 
 export function renamePerson(faceID, newName) {
 	people[faceID].name = newName;
-	fetch(server + "face/v1.0/persongroups/conversationpartners/persons/" + faceID, {
-		method: 'PATCH',
-		headers: {
-			Accept: 'application/json',
-			'Content-Type': 'application/json',
-			'Ocp-Apim-Subscription-Key': subscriptionKey
-		},
-		body: {
-			'name': newName,
-			'userData': ''
+	fetch(
+		server + 'face/v1.0/persongroups/conversationpartners/persons/' + faceID,
+		{
+			method: 'PATCH',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				'Ocp-Apim-Subscription-Key': subscriptionKey
+			},
+			body: {
+				name: newName,
+				userData: ''
+			}
 		}
-	});
+	);
 }
 
 /*
@@ -228,7 +231,8 @@ export async function loadNewEmotion(face, imageData) {
 			face.faceAttributes.emotion
 		),
 		personId: face['faceId'],
-		personName
+		personName,
+		people
 	};
 }
 
