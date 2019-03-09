@@ -4,11 +4,11 @@ const svg = require('../assets/logo.svg');
 
 class Expressions extends Component {
 	render() { 
+		const { expressions } = this.props;
 		return (
 			<div className='expressions'>
 				<img src={svg}></img>
-				<h2>This person is feeling</h2>
-				<p>happy but it seems like he's in a rush.</p>
+				<p>{JSON.stringify(expressions)}</p>
 			</div>
 		);
 	}
