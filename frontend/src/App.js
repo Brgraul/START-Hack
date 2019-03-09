@@ -36,8 +36,13 @@ class App extends Component {
 		const { expressions, error, interpretation } = this.state;
 		return (
 			<div className='App'>
+				<div className='bg-overlay' />
 				<Layout>
-					<Video handleImage={handleImage} interval={1000} />
+					<Video
+						handleImage={handleImage}
+						interval={1000}
+						backgroundColor='#3ddbfd'
+					/>
 					<Expressions
 						expressions={expressions}
 						error={error}
