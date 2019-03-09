@@ -1,0 +1,16 @@
+.startWebcam {
+	width: 120px;
+    height: 50px;
+    border-radius: 25px;
+    font-size: 9pt;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #fff;
+    border: 0px solid transparent;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%);
+}
+
+.startWebcam:focus {outline:0;}

@@ -3,7 +3,7 @@ export function getDeltaThreshold() {
 }
 
 export function getEmotionThreshold() {
-	return 0.8;
+	return 0.6;
 }
 
 export function getEmotionChangeThreshold() {
