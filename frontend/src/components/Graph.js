@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 
 class Expressions extends Component {
-	function refreshGraph(people, index) {
+	function refreshGraph(people) {
+		const index = document.getElementById("dropdown").selectedIndex;
 		var data = people[index].getPieData();
 
 		var w = 300,h = 300;
@@ -61,14 +62,21 @@ class Expressions extends Component {
 	}
 
 	render() { 
+		function populate(people) {
+			var menu = document.getElementById("dropdown");
+			for (personID in people) {
+				menu.options[menu.options.length] = new Option(people[personID].name, personID);
+			}
+		}
 		return (
 			const { people } = this.props;
+			populate(people);
 			<script src="https://d3js.org/d3.v5.min.js"></script>
 			<div class='widget'>
 				<div class='header'>Emotional Distribution</div>
 				<div id='chart' class='chart-container'></div>
 			</div>
-			<input type='button' onclick="refreshGraph(people, 0)">Refresh</input>
+			<input type='button' onclick="refreshGraph(people)">Refresh</input>
 		);
 	}
 }
