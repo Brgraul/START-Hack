@@ -129,6 +129,7 @@ export function load_new_emotion(face, imageData) {
 		!identified['candidates'] ||
 		identified['candidates'].length === 0
 	) {
+		console.log('person not identified');
 		const rect = face.faceRectangle;
 		if (!rect) return 'Rect not found';
 		const facerect = [rect.left, rect.top, rect.width, rect.height].join(',');
@@ -160,6 +161,7 @@ export function load_new_emotion(face, imageData) {
 		});
 		face['faceId'] = person_id;
 	} else {
+		console.log('person identified!');
 		face['faceId'] = identified['candidates'][0]['personId'];
 		personName = fetch(
 			server +
@@ -167,8 +169,10 @@ export function load_new_emotion(face, imageData) {
 				face['faceId'],
 			{ method: 'GET' }
 		).then(res => {
+			console.log(res.json());
 			return res.json()['name'];
 		});
+		console.log('name: ' + personName);
 	}
 	if (!(face['faceId'] in people)) {
 		people[face['faceId']] = new Person(face['faceId'], personName);

@@ -3,16 +3,9 @@ import { Video, Expressions, Layout } from './components/';
 import './App.css';
 class App extends Component {
 	state = {
-		expressions: {}
-	};
-
-	componentDidMount = () => {
-		this.setState({
-			expressions: {
-				happy: 1,
-				angry: 0.2
-			}
-		});
+		expressions: undefined,
+		error: undefined,
+		interpretation: undefined
 	};
 
 	handleImage = async image => {
@@ -24,19 +17,32 @@ class App extends Component {
 			},
 			body: JSON.stringify({ image })
 		});
-		const content = await rawResponse.json();
-
-		console.log(content);
+		const { expressions, interpretation, error } = await rawResponse.json();
+		if (expressions || error || interpretation) {
+			let currState = this.state;
+			currState = {
+				expressions: expressions ? expressions : currState.expressions,
+				error: error ? error : currState.error,
+				interpretation: interpretation
+					? interpretation
+					: currState.interpretation
+			};
+			this.setState(currState);
+		}
 	};
 
 	render() {
 		const { handleImage } = this;
-		const { expressions } = this.state;
+		const { expressions, error, interpretation } = this.state;
 		return (
 			<div className='App'>
 				<Layout>
 					<Video handleImage={handleImage} interval={1000} />
-					<Expressions expressions={expressions} />
+					<Expressions
+						expressions={expressions}
+						error={error}
+						interpretation={interpretation}
+					/>
 				</Layout>
 			</div>
 		);
