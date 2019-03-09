@@ -32,15 +32,15 @@ app.post('/analyzeframe', async (req, res) => {
 	} else {
 		res.json({ error: 'Please provide valid base64 encoded image' });
 	}
-	const filename = new Date().getSeconds() + '.png';
+	const filename = Date.now() + '.png'; //new Date().getSeconds() + '.png';
 	fs.writeFile('./frames/' + filename, base64Data, 'base64', err =>
 		console.log(err)
 	);
 	const url = 'http://local.flomllr.com/frames/' + filename;
 	console.log(url);
 	const { error, result: expressions } = await azure.getExpressions(url);
-	if (error) res.send({ error });
+	if (error) res.send({ error, expressions });
 	const returnstring = await feedback.loadNewEmotion(expressions, url);
 	console.log(returnstring);
-	res.send({ expressions: returnstring });
+	res.send({ interpretation: returnstring, expressions });
 });

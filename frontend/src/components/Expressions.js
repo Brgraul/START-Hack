@@ -2,14 +2,28 @@ import React, { Component } from 'react';
 import '../style/expressions.css';
 
 class Expressions extends Component {
-	render() { 
-		const { expressions } = this.props;
+	render() {
+		const { expressions, interpretation, error } = this.props;
+		const face = expressions ? expressions[0] : undefined;
+		const emotions = face ? face.faceAttributes.emotion : undefined;
 		return (
 			<div className='expressions'>
-				<p>{JSON.stringify(expressions)}</p>
+				<table>
+					<tbody>
+						{emotions ? Object.keys(emotions).map(function(key) {
+							return (
+								<tr>
+									<td>{key}</td>
+									<td>{emotions[key]}</td>
+								</tr>
+							);
+						}) : ''}
+					</tbody>
+				</table>
+				<p>{interpretation}</p>
 			</div>
 		);
 	}
 }
- 
+
 export default Expressions;

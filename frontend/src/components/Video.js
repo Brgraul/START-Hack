@@ -30,7 +30,7 @@ class Video extends Component {
 				ref={this.setRef}
 				screenshotFormat='image/jpeg'
 				videoConstraints={videoConstraints}
-				screenshotQuality={0.5}
+				screenshotQuality={0.8}
 			/>
 		);
 	}
