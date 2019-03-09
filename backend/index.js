@@ -2,6 +2,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import fs from 'fs';
 import cors from 'cors';
+import * as azure from './azure';
+
 
 const app = express();
 app.use(
@@ -16,12 +18,13 @@ app.listen(port, () => {
 	console.log('DiscountInCart Backend listening on port', port);
 });
 
+app.use('/frames', express.static('frames'))
 
 app.get('/', (req, res) => {
 	res.send(`Localhost`);
 });
 
-app.post('/analyzeframe', (req, res) => {
+app.post('/analyzeframe', async (req, res) => {
 	const { image } = req.body;
 	let base64Data;
 	if (image && image.split(',')[0].indexOf('base64') >= 0){
@@ -31,5 +34,9 @@ app.post('/analyzeframe', (req, res) => {
 	}
 	const filename = Date.now() + ".png";
 	fs.writeFile('./frames/'+filename, base64Data, 'base64', (err) => console.log(err));
-	res.send({ url: 'http://local.flomllr.com/' + filename });
+	const url = 'http://local.flomllr.com/frames/' + filename
+	console.log(url);
+	const { error, result: expressions } = await azure.getExpressions(url);
+	res.send({ expressions });
 });
+
