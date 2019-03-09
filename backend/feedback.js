@@ -44,6 +44,18 @@ function emotionToVector(emotion) {
 
 export function renamePerson(faceID, newName) {
 	people[faceID].name = newName;
+	fetch(server + "face/v1.0/persongroups/conversationpartners/persons/" + faceID, {
+		method: 'PATCH',
+		headers: {
+			Accept: 'application/json',
+			'Content-Type': 'application/json',
+			'Ocp-Apim-Subscription-Key': subscriptionKey
+		},
+		body: {
+			'name': newName,
+			'userData': ''
+		}
+	});
 }
 
 /*
