@@ -110,7 +110,7 @@ export async function loadNewEmotion(face, imageData) {
 				confidenceThreshold: 0.5
 			})
 		});
-		identified = await identifiedRaw.json();
+		identified = (await identifiedRaw.json())[0];
 	} catch (e) {
 		console.log(e);
 	}
@@ -155,7 +155,7 @@ export async function loadNewEmotion(face, imageData) {
 					'Ocp-Apim-Subscription-Key': subscriptionKey
 				},
 				body: JSON.stringify({ url: imageData }),
-				params: 'targetFace=' + facerect /* not sure about this either */
+				params: 'targetFace=' + facerect
 			}
 		);
 		fetch(server + 'face/v1.0/persongroups/conversationpartners/train', {
