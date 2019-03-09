@@ -5,6 +5,11 @@ const server = 'https://westeurope.api.cognitive.microsoft.com/face/v1.0/';
 
 var people = {};
 
+const positive = [-Math.sqrt(0.25), 0, 0, 0, Math.sqrt(0.25), 0, -Math.sqrt(0.25), Math.sqrt(0.25)];
+const anger = [Math.sqrt(0.5), Math.sqrt(0.5), 0, 0, 0, 0, 0, 0];
+const fear = [0, 0, Math.sqrt(0.5), Math.sqrt(0.5), 0, 0, 0, 0];
+const sad = [Math.sqrt(0.3333), Math.sqrt(0.3333), 0, 0, 0, 0, Math.sqrt(0.3333), 0];
+
 function emotion_to_vector(emotion) {
 	return [
 		emotion['anger'],
@@ -31,6 +36,14 @@ function force_feedback() {
 	return feedback.join('\n');
 }
 */
+
+function dot_prod(v, w) {
+	var tot = 0;
+	for (int i = 0; i < 8; i++) {
+		tot += v[i] * w[i];
+	}
+	return tot;
+}
 
 function norm(vector) {
 	var tot = 0;
@@ -59,40 +72,6 @@ function get_feedback(person, emotion) {
 	if (norm(delta) < thresholds.get_emotion_change_threshold()) {
 		return undefined;
 	}
-	var inc = 0;
-	var dec = 0;
-	var incEmo = '';
-	var decEmo = '';
-	if (vectors_unequal(delta, emoVec)) {
-		var index = 0;
-		for (var emo in emotion) {
-			if (
-				delta[index] > inc &&
-				delta[index] > thresholds.get_delta_threshold()
-			) {
-				inc = delta[index];
-				incEmo = emo;
-			}
-			if (
-				delta[index] < dec &&
-				delta[index] < -thresholds.get_delta_threshold()
-			) {
-				dec = delta[index];
-				decEmo = emo;
-			}
-			index++;
-		}
-	}
-	if (inc > 0) {
-		inc = `Greatest increase: ${incEmo}.`;
-	} else {
-		inc = '';
-	}
-	if (dec < 0) {
-		dec = `Greatest decrease: ${decEmo}.`;
-	} else {
-		dec = '';
-	}
 	let topEmotions = get_top_emotions(emotion);
 	if (topEmotions.length === 0) {
 		return 'No emotions detected';
@@ -100,8 +79,17 @@ function get_feedback(person, emotion) {
 	let primary = topEmotions[topEmotions.length - 1];
 	// Update last emotion
 	person.lastEmotion = emotion;
-	// Preliminary textual feedback
-	return `${person.name} is ${primary[1]} percent ${primary[0]}. ${inc} ${dec}`;
+	// Provide feedback based on reaction
+	if (dot(emotion, anger) > 0.8) {
+		return `You made ${person.name} angry.`;
+	} else if (dot(emotion, fear) > 0.8) {
+		return `You scared ${person.name}!`;
+	} else if (dot(emotion, sad) > 0.8) {
+		return `You made ${person.name} sad.`;
+	} else if (dot(emotion, positive) > 0.8) {
+		return `Good comeback! You made ${person.name} happy again!`;
+	}
+	return undefined;
 }
 
 export function load_new_emotion(face, imageData) {
