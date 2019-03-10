@@ -4,6 +4,7 @@ import fs from 'fs';
 import cors from 'cors';
 import * as azure from './azure';
 import * as feedback from './feedback';
+import * as tts from './tts';
 
 const app = express();
 app.use(
@@ -37,7 +38,7 @@ app.post('/analyzeframe', async (req, res) => {
 		console.log(err)
 	);
 	const url = 'http://local.flomllr.com/frames/' + filename;
-	console.log(url);
+	//console.log(url);
 	const { error, result: expressions } = await azure.getExpressions(url);
 	if (error) res.send({ error, expressions });
 	let face = expressions[0];
@@ -49,6 +50,7 @@ app.post('/analyzeframe', async (req, res) => {
 			personName
 		} = await feedback.loadNewEmotion(face, url);
 		console.log('Returnstring', interpretation);
+		tts.callApi(interpretation);
 		res.send({ interpretation, expressions, personId, personName });
 	} else {
 		console.log('Feedback not called');
