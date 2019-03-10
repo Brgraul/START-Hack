@@ -178,7 +178,7 @@ class App extends Component {
 					<Video
 						handleImage={handleImage}
 						interval={1000}
-						backgroundColor='#3ddbfd'
+						backgroundColor='#fcbfbe'
 					/>
 					<Expressions
 						expressions={expressions}
