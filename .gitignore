@@ -26,3 +26,5 @@ frontendyarn-debug.log*
 frontendyarn-error.log*
 
 *.ignore
+
+*.wav
