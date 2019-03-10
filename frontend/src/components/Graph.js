@@ -1,11 +1,26 @@
 import React, { Component } from 'react';
 
 class Graph extends Component {
+
+	emotionToVector = (emotion) => {
+		return [
+			emotion['anger'],
+			emotion['contempt'],
+			emotion['disgust'],
+			emotion['fear'],
+			emotion['happiness'],
+			emotion['neutral'],
+			emotion['sadness'],
+			emotion['surprise']
+		];
+	};
+
 	getPieData = (person) => {
 		const count = person.emotionHistory.length;
+		console.log(person.emotionHistory);
 		let freq = [0, 0, 0, 0, 0, 0, 0, 0];
 		for (let i = 0; i < count; i++) {
-			this.vectorAddInplace(freq, person.emotionHistory[i]);
+			this.vectorAddInplace(freq, this.emotionToVector(person.emotionHistory[i]));
 		}
 		let data = [
 			{ name: 'Anger', value: freq[0] / count },
@@ -32,9 +47,10 @@ class Graph extends Component {
 		let person = people[key];
 		let data = this.getPieData(person);
 		let html = "<ul>\n";
-		for (var emotion in data) {
-			html += "<li>" + emotion.name + ": " + (emotion.value * 100) + "%\n";
-		}
+		data.forEach(emotion => {
+			console.log(emotion);
+			html += "<li>" + emotion.name + ": " + ((emotion.value * 100).toFixed(2)) + "%\n";
+		});
 		html += "</ul>"
 		document.getElementById('chart').innerHTML = html;
 	};
@@ -61,7 +77,6 @@ class Graph extends Component {
 		this.populate(people);
 		return (
 			<React.Fragment>
-				<script src='https://d3js.org/d3.v5.min.js' />
 				<div className='widget'>
 					<div className='header'>Emotional Distribution</div>
 					<div id='chart' />
