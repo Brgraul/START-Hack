@@ -53,10 +53,10 @@ export function renamePerson(faceID, newName) {
 				'Content-Type': 'application/json',
 				'Ocp-Apim-Subscription-Key': subscriptionKey
 			},
-			body: {
+			body: JSON.stringify({
 				name: newName,
 				userData: ''
-			}
+			})
 		}
 	);
 }

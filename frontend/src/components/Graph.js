@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import * as d3 from 'd3';
 
 class Graph extends Component {
 	getPieData = (person) => {
@@ -28,82 +27,16 @@ class Graph extends Component {
 	};
 
 	refreshGraph = people => {
-		const select = document.getElementById('dropdown');
-		const key = select.options[select.selectedIndex].value;
-		var person = people[key];
-		console.log(person);
+		const dropdown = document.getElementById('dropdown');
+		const key = dropdown.options[dropdown.selectedIndex].value;
+		let person = people[key];
 		let data = this.getPieData(person);
-
-		var w = 300,
-			h = 300;
-		var radius = (w - 20) / 2;
-
-		var pie = d3.pie()
-			.value(function(d) {
-				return d.value;
-			})
-			.sort(null);
-		var arc = d3.arc()
-			.innerRadius(0)
-			.outerRadius(radius);
-		var color = d3.scaleOrdinal()
-			.range([
-				'#ff0000',
-				'#ffaa00',
-				'#009900',
-				'#ffff00',
-				'#00ff00',
-				'#dddddd',
-				'#0000ff',
-				'#00ffff'
-			]);
-		const chartEl = document.getElementById('chart');
-		var svg = d3
-			.select(chartEl)
-			.append('svg')
-			.attr({
-				width: w,
-				height: h,
-				class: 'shadow'
-			})
-			.append('g')
-			.attr('transform', 'translate(' + w / 2 + ',' + h / 2 + ')');
-		var path = svg
-			.selectAll('path')
-			.data(pie(data))
-			.enter()
-			.append('path')
-			.attr({
-				d: arc,
-				fill: function(d, i) {
-					return color(i);
-				}
-			})
-			.style({
-				'fill-opacity': 0.15,
-				stroke: function(d, i) {
-					return color(i);
-				},
-				'stroke-width': '2px'
-			});
-		var text = svg
-			.selectAll('text')
-			.data(pie(data))
-			.enter()
-			.append('text')
-			.attr('transform', function(d) {
-				return 'translate(' + arc.centroid(d) + ')';
-			})
-			.attr('text-anchor', 'middle')
-			.text(function(d) {
-				return d.data.name + ' (' + d.data.percent + '%)';
-			})
-			.style({
-				fill: function(d, i) {
-					return color(i);
-				},
-				'font-size': '18px'
-			});
+		let html = "<ul>\n";
+		for (var emotion in data) {
+			html += "<li>" + emotion.name + ": " + (emotion.value * 100) + "%\n";
+		}
+		html += "</ul>"
+		document.getElementById('chart').innerHTML = html;
 	};
 
 	populate = people => {
@@ -131,7 +64,7 @@ class Graph extends Component {
 				<script src='https://d3js.org/d3.v5.min.js' />
 				<div className='widget'>
 					<div className='header'>Emotional Distribution</div>
-					<div id='chart' className='chart-container' />
+					<div id='chart' />
 				</div>
 				<select id='dropdown' />
 				<button type='button' onClick={() => this.refreshGraph(people)}>
