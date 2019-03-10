@@ -51,7 +51,7 @@ export function textToSpeech(accessToken, text) {
 
 	let request = rp(options).on('response', response => {
 		if (response.statusCode === 200) {
-			request.pipe(fs.createWriteStream('TTSOutput.wav'));
+			request.pipe(fs.createWriteStream(Date.now() + '.wav'));
 			console.log('\nYour file is ready.\n');
 		}
 	});
