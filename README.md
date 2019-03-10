@@ -1,6 +1,6 @@
 # START-Hack 2019
 
-![alt text](https://raw.githubusercontent.com/brgraul/START-Hack/tree/master/static_assets/name.png)
+![alt text](master/static_assets/name.png)
 
 ## The problem
 
