@@ -1,11 +1,35 @@
 import Person from './person';
 import * as thresholds from './thresholds';
 const fetch = require('node-fetch');
-const server = 'https://westeurope.api.cognitive.microsoft.com/face/v1.0/';
+const server = 'https://westeurope.api.cognitive.microsoft.com/';
+const subscriptionKey = '94e0060162d84581975ef1011b018af9';
 
 var people = {};
 
-function emotion_to_vector(emotion) {
+const positive = [
+	-Math.sqrt(0.25),
+	0,
+	0,
+	0,
+	Math.sqrt(0.25),
+	0,
+	-Math.sqrt(0.25),
+	Math.sqrt(0.25)
+];
+const anger = [Math.sqrt(0.5), Math.sqrt(0.5), 0, 0, 0, 0, 0, 0];
+const fear = [0, 0, Math.sqrt(0.5), Math.sqrt(0.5), 0, 0, 0, 0];
+const sad = [
+	Math.sqrt(0.3333),
+	Math.sqrt(0.3333),
+	0,
+	0,
+	0,
+	0,
+	Math.sqrt(0.3333),
+	0
+];
+
+function emotionToVector(emotion) {
 	return [
 		emotion['anger'],
 		emotion['contempt'],
@@ -18,19 +42,27 @@ function emotion_to_vector(emotion) {
 	];
 }
 
-/*
-function rename_person(faceID, newName) {
+export function renamePerson(faceID, newName) {
 	people[faceID].name = newName;
 }
 
-function force_feedback() {
+/*
+function forceFeedback() {
 	feedback = [];
 	for (const [id, person] of Object.entries(people)) {
-		feedback.push(get_feedback(person, person.lastEmotion));
+		feedback.push(getFeedback(person, person.lastEmotion));
 	}
 	return feedback.join('\n');
 }
 */
+
+function dot(v, w) {
+	var tot = 0;
+	for (let i = 0; i < 8; i++) {
+		tot += v[i] * w[i];
+	}
+	return tot;
+}
 
 function norm(vector) {
 	var tot = 0;
@@ -40,7 +72,8 @@ function norm(vector) {
 	return Math.sqrt(tot);
 }
 
-function vectors_unequal(v1, v2) {
+/*
+function vectorsUnequal(v1, v2) {
 	for (var i = 0; i < 8; i++) {
 		if (v1[i] !== v2[i]) {
 			return true;
@@ -48,82 +81,62 @@ function vectors_unequal(v1, v2) {
 	}
 	return false;
 }
-
-function get_feedback(person, emotion) {
-	var emoVec = emotion_to_vector(emotion);
-	var oldEmo = person.get_emotion_vector();
+*/
+function getFeedback(person, emotion) {
+	var emoVec = emotionToVector(emotion);
+	var oldEmo = person.getEmotionVector();
 	var delta = [];
 	for (var i = 0; i < 8; i++) {
 		delta.push(emoVec[i] - oldEmo[i]);
 	}
-	if (norm(delta) < thresholds.get_emotion_change_threshold()) {
+	if (norm(delta) < thresholds.getEmotionChangeThreshold()) {
 		return undefined;
 	}
-	var inc = 0;
-	var dec = 0;
-	var incEmo = '';
-	var decEmo = '';
-	if (vectors_unequal(delta, emoVec)) {
-		var index = 0;
-		for (var emo in emotion) {
-			if (
-				delta[index] > inc &&
-				delta[index] > thresholds.get_delta_threshold()
-			) {
-				inc = delta[index];
-				incEmo = emo;
-			}
-			if (
-				delta[index] < dec &&
-				delta[index] < -thresholds.get_delta_threshold()
-			) {
-				dec = delta[index];
-				decEmo = emo;
-			}
-			index++;
-		}
-	}
-	if (inc > 0) {
-		inc = `Greatest increase: ${incEmo}.`;
-	} else {
-		inc = '';
-	}
-	if (dec < 0) {
-		dec = `Greatest decrease: ${decEmo}.`;
-	} else {
-		dec = '';
-	}
-	let topEmotions = get_top_emotions(emotion);
+	let topEmotions = getTopEmotions(emotion);
 	if (topEmotions.length === 0) {
 		return 'No emotions detected';
 	}
-	let primary = topEmotions[topEmotions.length - 1];
+	//let primary = topEmotions[topEmotions.length - 1];
 	// Update last emotion
-	person.lastEmotion = emotion;
-	// Preliminary textual feedback
-	return `${person.name} is ${primary[1]} percent ${primary[0]}. ${inc} ${dec}`;
+	person.setEmotion(emotion);
+	// Provide feedback based on reaction
+	console.log('Dot', dot(emoVec, sad));
+	if (dot(emoVec, anger) > 0.2) {
+		return `You made ${person.name} angry.`;
+	} else if (dot(emoVec, fear) > 0.2) {
+		return `You scared ${person.name}!`;
+	} else if (dot(emoVec, sad) > 0.2) {
+		return `You made ${person.name} sad.`;
+	} else if (dot(emoVec, positive) > 0.2) {
+		return `Good comeback! You made ${person.name} happy again!`;
+	}
+	return undefined;
 }
 
-export function load_new_emotion(face, imageData) {
+export async function loadNewEmotion(face, imageData) {
 	console.log('Face1', face);
-	face = face[0];
 	let identified = undefined;
 	try {
-		identified = fetch(server + 'face/v1.0/identify', {
+		let identifiedRaw = await fetch(server + 'face/v1.0/identify', {
 			method: 'POST',
-			body: {
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				'Ocp-Apim-Subscription-Key': subscriptionKey
+			},
+			body: JSON.stringify({
 				personGroupId: 'conversationpartners',
 				faceIds: [face['faceId']],
 				maxNumOfCandidatesReturned: 1,
 				confidenceThreshold: 0.5
-			}
-		}).then(res => {
-			return res.json();
+			})
 		});
+		identified = (await identifiedRaw.json())[0];
 	} catch (e) {
-		return e.toString();
+		console.log('Model not yet trained');
 	}
 	var personName = 'Unnamed person';
+	console.log('Identified', identified);
 	if (
 		!identified ||
 		!identified['candidates'] ||
@@ -133,58 +146,84 @@ export function load_new_emotion(face, imageData) {
 		const rect = face.faceRectangle;
 		if (!rect) return 'Rect not found';
 		const facerect = [rect.left, rect.top, rect.width, rect.height].join(',');
-		const person_id = fetch(
+		let personResult = await fetch(
 			server + 'face/v1.0/persongroups/conversationpartners/persons',
 			{
 				method: 'POST',
-				body: {
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+					'Ocp-Apim-Subscription-Key': subscriptionKey
+				},
+				body: JSON.stringify({
 					name: personName,
 					userData: ''
-				}
+				})
 			}
-		).then(res => {
-			return res.json()['personId'];
-		});
+		);
+		const personID = (await personResult.json())['personId'];
 		fetch(
 			server +
 				'face/v1.0/persongroups/conversationpartners/persons/' +
-				person_id +
+				personID +
 				'/persistedfaces',
 			{
 				method: 'POST',
-				body: { url: imageData },
-				params: 'targetFace=' + facerect /* not sure about this either */
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+					'Ocp-Apim-Subscription-Key': subscriptionKey
+				},
+				body: JSON.stringify({ url: imageData }),
+				params: 'targetFace=' + facerect
 			}
 		);
 		fetch(server + 'face/v1.0/persongroups/conversationpartners/train', {
-			method: 'POST'
+			method: 'POST',
+			headers: {
+				Accept: 'application/json',
+				'Content-Type': 'application/json',
+				'Ocp-Apim-Subscription-Key': subscriptionKey
+			}
 		});
-		face['faceId'] = person_id;
+		face['faceId'] = personID;
 	} else {
 		console.log('person identified!');
 		face['faceId'] = identified['candidates'][0]['personId'];
-		personName = fetch(
+		let result = await fetch(
 			server +
 				'face/v1.0/persongroups/conversationpartners/persons/' +
 				face['faceId'],
-			{ method: 'GET' }
-		).then(res => {
-			console.log(res.json());
-			return res.json()['name'];
-		});
-		console.log('name: ' + personName);
+			{
+				method: 'GET',
+				headers: {
+					Accept: 'application/json',
+					'Content-Type': 'application/json',
+					'Ocp-Apim-Subscription-Key': subscriptionKey
+				}
+			}
+		);
+		personName = (await result.json())['name'];
+		console.log('name: ', personName);
 	}
 	if (!(face['faceId'] in people)) {
 		people[face['faceId']] = new Person(face['faceId'], personName);
 	}
-	console.log('Face2', face.faceAttributes);
-	return get_feedback(people[face.faceId], face.faceAttributes.emotion);
+	console.log('FaceId', face.faceId);
+	return {
+		interpretation: getFeedback(
+			people[face.faceId],
+			face.faceAttributes.emotion
+		),
+		personId: face['faceId'],
+		personName
+	};
 }
 
-function get_top_emotions(emotion) {
+function getTopEmotions(emotion) {
 	let emotions = [];
 	for (const [emo, value] of Object.entries(emotion)) {
-		if (value > thresholds.get_emotion_threshold()) {
+		if (value > thresholds.getEmotionThreshold()) {
 			emotions.push([emo, value]);
 		}
 	}

@@ -40,7 +40,24 @@ app.post('/analyzeframe', async (req, res) => {
 	console.log(url);
 	const { error, result: expressions } = await azure.getExpressions(url);
 	if (error) res.send({ error, expressions });
-	const returnstring = await feedback.load_new_emotion(expressions, url);
-	console.log(returnstring);
-	res.send({ interpretation: returnstring, expressions });
+	let face = expressions[0];
+	console.log('Face', face);
+	if (face) {
+		const {
+			interpretation,
+			personId,
+			personName
+		} = await feedback.loadNewEmotion(face, url);
+		console.log('Returnstring', interpretation);
+		res.send({ interpretation, expressions, personId, personName });
+	} else {
+		console.log('Feedback not called');
+		res.send({ expressions });
+	}
+});
+
+app.post('/rename', async (req, res) => {
+	const { personId, name } = req.body;
+	feedback.renamePerson(personId, name);
+	res.end(200);
 });
