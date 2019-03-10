@@ -1,6 +1,6 @@
 # START-Hack 2019
 
-![alt text](master/static_assets/name.png)
+![ScreenShot](static_assets/screenshot.jpg)
 
 ## The problem
 
