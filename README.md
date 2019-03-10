@@ -1,5 +1,7 @@
 # START-Hack 2019
 
+![alt text](https://raw.githubusercontent.com/brgraul/START-Hack/tree/master/static_assets/name.png)
+
 ## The problem
 
 To create a better world and increase understanding among each other, everyone have similar cognitive oportunities, or at least a common ground in this regards. 80% of human communication is non-verbal, and blind people are deprived of that valuable part. This is a barrier for emotional connections, and we are here to bring it down.
