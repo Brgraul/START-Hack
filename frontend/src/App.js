@@ -2,6 +2,58 @@ import React, { Component } from 'react';
 import { Video, Expressions, Layout, Graph } from './components/';
 import './App.css';
 class App extends Component {
+	getPieData = (person) => {
+		const count = person.emotionHistory.length;
+		let freq = [0, 0, 0, 0, 0, 0, 0, 0];
+		for (let i = 0; i < count; i++) {
+			this.vectorAddInplace(freq, person.emotionHistory[i]);
+		}
+		let data = [
+			{ name: 'Anger', value: freq[0] / count },
+			{ name: 'Contempt', value: freq[1] / count },
+			{ name: 'Disgust', value: freq[2] / count },
+			{ name: 'Fear', value: freq[3] / count },
+			{ name: 'Happiness', value: freq[4] / count },
+			{ name: 'Neutral', value: freq[5] / count },
+			{ name: 'Sadness', value: freq[6] / count },
+			{ name: 'Surprise', value: freq[7] / count }
+		];
+		return data;
+	};
+
+	vectorAddInplace = (v, w) => {
+		for (let i = 0; i < v.length; i++) {
+			v[i] += w[i];
+		}
+	};
+
+	refreshGraph = people => {
+		const dropdown = document.getElementById('dropdown');
+		const key = dropdown.options[dropdown.selectedIndex].value;
+		let person = people[key];
+		let data = this.getPieData(person);
+		let html = "<ul>\n";
+		for (var emotion in data) {
+			html += "<li>" + emotion.name + ": " + (emotion.value * 100) + "%\n";
+		}
+		html += "</ul>"
+		document.getElementById('chart').innerHTML = html;
+		let menu = document.getElementById('dropdown');
+		if(menu){
+			let newDropdown = document.createElement('select');
+			newDropdown.id = 'dropdown';
+			menu.insertAdjacentElement('afterend', newDropdown);
+			menu.remove();
+			menu = newDropdown;
+		}
+		for (let personID in people) {
+			menu.options[menu.options.length] = new Option(
+				people[personID].name,
+				personID
+			);
+		}
+	};
+
 	state = {
 		expressions: undefined,
 		error: undefined,
@@ -66,6 +118,7 @@ class App extends Component {
 					: currState.interpretation
 			};
 			this.setState(currState);
+			this.refreshGraph(people);
 		}
 		console.log('Name', personName, personId);
 		this.setState({
@@ -116,7 +169,7 @@ class App extends Component {
 						personName={personName}
 						changeName={changeName}
 					/>
-					<Graph people={people} />
+					<Graph />
 				</Layout>
 			</div>
 		);
