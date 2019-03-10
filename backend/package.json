@@ -6,6 +6,11 @@
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "fs": "^0.0.1-security",
-    "node-fetch": "^2.3.0"
+    "node-fetch": "^2.3.0",
+    "node-wav-player": "^0.1.0",
+    "readline-sync": "^1.4.9",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "xmlbuilder": "^11.0.0"
   }
 }
