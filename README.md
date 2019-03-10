@@ -16,7 +16,7 @@ Along these 31 hours, we built a working Web Application that performs sentiment
 * Sentiment Analysis -> Azure Face API
 * Text to Speech -> Azure TTS API
 
-##Our Vision
+## Our Vision
 
 Our bigger picture is to implement this framework into a pair of glasses, that discretly scans and feedbacks the enviroment to the user in need. Using cameras for the face detection and bone conduction for communicating the feedback - enabling emotions for everyone!
 
