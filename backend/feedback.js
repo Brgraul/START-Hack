@@ -42,10 +42,10 @@ function emotionToVector(emotion) {
 	];
 }
 
-export function renamePerson(faceID, newName) {
-	people[faceID].name = newName;
+export function renamePerson(personID, newName) {
+	people[personID].name = newName;
 	fetch(
-		server + 'face/v1.0/persongroups/conversationpartners/persons/' + faceID,
+		server + 'face/v1.0/persongroups/conversationpartners/persons/' + personID,
 		{
 			method: 'PATCH',
 			headers: {
@@ -201,14 +201,14 @@ export async function loadNewEmotion(face, imageData) {
 				'Ocp-Apim-Subscription-Key': subscriptionKey
 			}
 		});
-		face['faceId'] = personID;
+		face['personID'] = personID;
 	} else {
 		console.log('person identified!');
-		face['faceId'] = identified['candidates'][0]['personId'];
+		face['personID'] = identified['candidates'][0]['personId'];
 		let result = await fetch(
 			server +
 				'face/v1.0/persongroups/conversationpartners/persons/' +
-				face['faceId'],
+				face['personID'],
 			{
 				method: 'GET',
 				headers: {
@@ -221,16 +221,15 @@ export async function loadNewEmotion(face, imageData) {
 		personName = (await result.json())['name'];
 		console.log('name: ', personName);
 	}
-	if (!(face['faceId'] in people)) {
-		people[face['faceId']] = new Person(face['faceId'], personName);
+	if (!(face['personID'] in people)) {
+		people[face['personID']] = new Person(face['personID'], personName);
 	}
-	console.log('FaceId', face.faceId);
 	return {
 		interpretation: getFeedback(
-			people[face.faceId],
+			people[face.personID],
 			face.faceAttributes.emotion
 		),
-		personId: face['faceId'],
+		personId: face['personID'],
 		personName,
 		people
 	};
