@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import '../style/layout.css';
-const svg = require('../assets/logo_white.svg');
+const svg = require('../assets/ear-white.svg');
 
 class Layout extends Component {
 	render() { 
