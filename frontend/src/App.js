@@ -8,7 +8,7 @@ class App extends Component {
 		interpretation: undefined
 	};
 
-	componentDidMount = () => {
+	componentDidMount = async () => {
 		try {
 			await fetch('https://westeurope.api.cognitive.microsoft.com/face/v1.0/persongroups/conversationpartners', {
 				method: 'POST',
