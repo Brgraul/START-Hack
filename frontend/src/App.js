@@ -6,7 +6,7 @@ class App extends Component {
 		const count = person.emotionHistory.length;
 		let freq = [0, 0, 0, 0, 0, 0, 0, 0];
 		for (let i = 0; i < count; i++) {
-			this.vectorAddInplace(freq, person.emotionHistory[i]);
+			this.vectorAddInplace(freq, this.emotionToVector(person.emotionHistory[i]));
 		}
 		let data = [
 			{ name: 'Anger', value: freq[0] / count },
@@ -27,17 +27,21 @@ class App extends Component {
 		}
 	};
 
+	emotionToVector = (emotion) => {
+		return [
+			emotion['anger'],
+			emotion['contempt'],
+			emotion['disgust'],
+			emotion['fear'],
+			emotion['happiness'],
+			emotion['neutral'],
+			emotion['sadness'],
+			emotion['surprise']
+		];
+	}
+
 	refreshGraph = people => {
-		const dropdown = document.getElementById('dropdown');
-		const key = dropdown.options[dropdown.selectedIndex].value;
-		let person = people[key];
-		let data = this.getPieData(person);
-		let html = "<ul>\n";
-		for (var emotion in data) {
-			html += "<li>" + emotion.name + ": " + (emotion.value * 100) + "%\n";
-		}
-		html += "</ul>"
-		document.getElementById('chart').innerHTML = html;
+		console.log(people);
 		let menu = document.getElementById('dropdown');
 		if(menu){
 			let newDropdown = document.createElement('select');
@@ -52,6 +56,20 @@ class App extends Component {
 				personID
 			);
 		}
+		console.log(menu);
+		const option = menu.options[menu.selectedIndex]
+		console.log(option);
+		if(!option) return;
+		console.log('Not returning');
+		const key = option.value;
+		let person = people[key];
+		let data = this.getPieData(person);
+		let html = "<ul>\n";
+		data.forEach(emotion => {
+			html += "<li>" + emotion.name + ": " + ((emotion.value * 100).toFixed(2)) + "%\n";
+		});
+		html += "</ul>"
+		document.getElementById('chart').innerHTML = html;
 	};
 
 	state = {
@@ -72,7 +90,8 @@ class App extends Component {
 					headers: {
 						'Content-Type': 'application/json',
 						'Ocp-Apim-Subscription-Key': '94e0060162d84581975ef1011b018af9'
-					}
+					},
+					body: JSON.stringify({name: 'conversationpartners'})
 				}
 			);
 		} catch (e) {}
@@ -107,7 +126,7 @@ class App extends Component {
 			personName,
 			people
 		} = await rawResponse.json();
-		if (expressions || error || interpretation) {
+		if (expressions || error || interpretation || people) {
 			let currState = this.state;
 			currState = {
 				expressions: expressions ? expressions : currState.expressions,
@@ -118,13 +137,13 @@ class App extends Component {
 					: currState.interpretation
 			};
 			this.setState(currState);
-			this.refreshGraph(people);
 		}
 		console.log('Name', personName, personId);
 		this.setState({
 			personId,
 			personName
 		});
+		this.refreshGraph(people);
 	};
 
 	changeName = async (name, personId) => {
