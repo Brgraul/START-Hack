@@ -104,6 +104,8 @@ function getFeedback(person, emotion) {
 	for (var i = 0; i < 8; i++) {
 		delta.push(emoVec[i] - oldEmo[i]);
 	}
+	// Update last emotion
+	person.setEmotion(emotion);
 	if (norm(delta) < thresholds.getEmotionChangeThreshold()) {
 		return undefined;
 	}
@@ -112,8 +114,6 @@ function getFeedback(person, emotion) {
 		return 'No emotions detected';
 	}
 	//let primary = topEmotions[topEmotions.length - 1];
-	// Update last emotion
-	person.setEmotion(emotion);
 	// Provide feedback based on reaction
 	console.log('Dot', dot(emoVec, sad));
 	if (dot(emoVec, anger) > 0.2) {
