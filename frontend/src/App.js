@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Video, Expressions, Layout, Graph } from './components/';
+import { Video, Expressions, Layout } from './components/';
 import './App.css';
 class App extends Component {
 	getPieData = (person) => {
@@ -64,11 +64,11 @@ class App extends Component {
 		const key = option.value;
 		let person = people[key];
 		let data = this.getPieData(person);
-		let html = "<ul>\n";
+		let html = "<table>\n";
 		data.forEach(emotion => {
-			html += "<li>" + emotion.name + ": " + ((emotion.value * 100).toFixed(2)) + "%\n";
+			html += "<tr><td>" + emotion.name + "</td><td>" + ((emotion.value * 100).toFixed(2)) + "</td></tr>";
 		});
-		html += "</ul>"
+		html += "</table>"
 		document.getElementById('chart').innerHTML = html;
 	};
 
@@ -127,9 +127,10 @@ class App extends Component {
 			people
 		} = await rawResponse.json();
 		if (expressions || error || interpretation || people) {
+			console.log('Expressions', expressions);
 			let currState = this.state;
 			currState = {
-				expressions: expressions ? expressions : currState.expressions,
+				expressions: expressions && expressions.length ? expressions : currState.expressions,
 				error: error ? error : currState.error,
 				people: people ? people : currState.people,
 				interpretation: interpretation
@@ -188,7 +189,6 @@ class App extends Component {
 						personName={personName}
 						changeName={changeName}
 					/>
-					<Graph />
 				</Layout>
 			</div>
 		);

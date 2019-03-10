@@ -2,6 +2,7 @@
 	padding: 0 0 50px 0;
 }
 
+/*
 .widget {
     margin: 0 auto;
     width:350px;
@@ -25,6 +26,7 @@
     text-shadow: 1px 1px #fff;
     border-bottom: 1px solid #eaeaea;
 }
+*/
  
 .chart-container{
     padding:25px;
@@ -34,7 +36,17 @@
 	width: 100%;
 	height: 250px;
 	position: absolute;
-	background-color: #c6e7e2;
+	background-color:#c6e7e2;
 	z-index: -1;
 	top: -30px;
+}
+
+.hide, #dropdown {
+	display: none!important;
+}
+
+.logo-footer {
+	margin: 40px auto;
+	display: block;
+	height: 40px;
 }

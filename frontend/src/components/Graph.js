@@ -4,11 +4,11 @@ class Graph extends Component {
 	render() {
 		return (
 			<React.Fragment>
-				<div className='widget'>
-					<div className='header'>Emotional Distribution</div>
+				<div className='widget average'>
+					<h2>Average Emotions</h2>
 					<div id='chart' />
 				</div>
-				<select id='dropdown' />
+				<select className='hide' id='dropdown' />
 			</React.Fragment>
 		);
 	}
