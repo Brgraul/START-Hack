@@ -1,6 +1,6 @@
 # START-Hack 2019  ️
 
-![ScreenShot](static_assets/name.png) 
+![ScreenShot](https://i.ibb.co/xLb61FB/Mesa-de-trabajo-1-copia-11-300x.png) 
 
 ## The problem :broken_heart:
 
