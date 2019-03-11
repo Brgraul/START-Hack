@@ -2,6 +2,8 @@
 
 ![ScreenShot](https://i.ibb.co/xLb61FB/Mesa-de-trabajo-1-copia-11-300x.png) 
 
+<img src="https://i.ibb.co/xLb61FB/Mesa-de-trabajo-1-copia-11-300x.png" alt="drawing" width="200"/>
+
 ## The problem :broken_heart:
 
 To create a better world and increase understanding among each other, everyone have similar cognitive oportunities, or at least a common ground in this regards. 80% of human communication is non-verbal, and blind people are deprived of that valuable part. This is a barrier for emotional connections, and we are here to bring it down.
